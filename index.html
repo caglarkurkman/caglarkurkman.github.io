@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kişisel Web Sitem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"  crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/"
+            }
+        }
+    </script>
+    <style>
+        /* ===================== Genel Stil ===================== */
+        :root {
+            --primary-color: #b71c1c;
+            --background-dark: #121212;
+            --background-medium: #1f1f1f;
+            --text-light: #f5f5f5;
+            --text-medium: #ccc;
+            --text-dark: #aaa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        section {
+            padding: 5rem 1rem;
+        }
+
+        /* ===================== Navbar ===================== */
+        /* ===================== Navbar ===================== */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(31, 31, 31, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.25rem 0;
+    z-index: 100;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+}
+
+.nav-links a {
+    font-weight: 500;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.hamburger {
+    display: none; /* Masaüstünde gizli */
+    cursor: pointer;
+    margin-left: 1.5rem;
+}
+
+.bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px auto;
+    background-color: var(--text-light);
+    transition: all 0.3s ease-in-out;
+}
+
+/* ===================== Responsive Hamburger Menü Kuralları ===================== */
+@media (max-width: 768px) {
+    nav {
+        justify-content: flex-end; /* Menüyü sağa hizala */
+        padding: 1.25rem 1rem;
+    }
+
+    .nav-links {
+        display: none; /* Mobil cihazda linkleri gizle */
+        flex-direction: column;
+        width: 100%;
+        background: rgba(31, 31, 31, 0.95);
+        position: absolute;
+        top: 5rem;
+        left: 0;
+        padding: 1rem 0;
+        transform: translateY(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .nav-links.active {
+        display: flex; /* Aktif olduğunda görünür yap */
+        transform: translateY(0);
+    }
+
+    .nav-links a {
+        padding: 0.75rem 0;
+        text-align: center;
+        border-bottom: 1px solid #333;
+    }
+
+    .hamburger {
+    display: block; /* Mobil cihazda görünür */
+    cursor: pointer;
+    position: absolute;  /* EKLE */
+    left: 1.5rem;        /* EKLE - Sol tarafta konumlandırır */
+    top: 50%;            /* EKLE */
+    transform: translateY(-50%); /* EKLE - Dikey ortalama */
+}
+
+    /* Hamburger ikon animasyonu */
+    .hamburger.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    .hamburger.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .hamburger.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+}
+/* ===================== Hakkımda ===================== */
+#hakkimda {
+    position: relative;
+    padding-top: 8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* ===================== Dinamik Arka Plan Kelimeleri (Güncellenmiş) ===================== */
+#hakkimda .background-text {
+    position: absolute;
+    font-family: 'Roboto Mono', monospace;
+    font-size: clamp(1rem, 5vw, 2.5rem);
+    color: rgba(255, 255, 255, 0.05); /* Daha da hafif bir renk */
+    pointer-events: none;
+    z-index: 1;
+    white-space: nowrap;
+    opacity: 0;
+    transition: transform 1s ease-out, opacity 1s ease-in;
+    /* Metin ve resim alanından uzak durmak için eklenen özellikler */
+    transform-origin: center center; /* Döndürme merkezini ayarla */
+}
+
+#hakkimda .background-text.visible {
+    opacity: 1;
+}
+
+#hakkimda img {
+    width: 12.5rem;
+    height: 12.5rem;
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+    border: 5px solid var(--primary-color);
+    object-fit: cover;
+    box-shadow: 0 0 20px rgba(255, 64, 129, 0.4);
+    z-index: 2; /* Resmin kelimelerin üstünde kalmasını sağlar */
+}
+
+#hakkimda h1 {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    color: var(--primary-color);
+    z-index: 2; /* Başlığın kelimelerin üstünde kalmasını sağlar */
+}
+
+#hakkimda p {
+    max-width: 45rem;
+    font-size: 1rem;
+    color: var(--text-medium);
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.8;
+    text-align: center;
+    padding: 0 1rem;
+    z-index: 2; /* Paragrafın kelimelerin üstünde kalmasını sağlar */
+}
+
+/* Mobil cihazlar için ek detayları gizle */
+@media (max-width: 768px) {
+    #hakkimda .background-text {
+        display: none; /* Küçük ekranlarda tamamen gizle */
+    }
+}
+        /* ===================== 3D Model ===================== */
+
+#model-viewer {
+    position: relative; /* İçindeki '.three-background-text'leri konumlandırmak için */
+    padding: 2.5rem 1rem;
+    overflow: hidden; /* Dışarı taşan kelimelerin kaydırma çubuğu yaratmasını engeller */
+}
+
+#three-container {
+    position: relative; /* THREE.js canvas'ı için */
+    width: 100%;
+    max-width: 56.25rem;
+    height: 31.25rem;
+    background: #000;
+    border-radius: 1rem;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 2; /* Kelimelerin önünde kalır */
+}
+
+/* 3D Modelin etrafındaki kelimeler */
+.three-background-text {
+    position: absolute;
+    font-family: 'Roboto Mono', monospace;
+    font-size: clamp(1rem, 2vw, 2.5rem); /* Font boyutu küçültüldü */
+    color: rgba(255, 255, 255, 0.12); /* Görünürlüğü artırıldı */
+    pointer-events: none;
+    z-index: 1; /* Modelin arkasında kalır */
+    white-space: nowrap;
+    transition: opacity 1s ease-in, transform 1s ease-out;
+    opacity: 1;
+}
+
+/* Mobil cihazlarda kelimeleri gizle veya küçült */
+@media (max-width: 768px) {
+    .three-background-text {
+        display: none; /* Küçük ekranlarda tamamen gizle */
+    }
+}
+
+        /* ===================== Portfolyo ===================== */
+        #portfolyo {
+            background-color: var(--background-medium);
+        }
+
+        #portfolyo h2 {
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            color: var(--primary-color);
+        }
+
+        .portfolio-wrapper {
+            position: relative;
+            max-width: 62.5rem;
+            margin: 2.5rem auto;
+            overflow: hidden;
+        }
+
+        .portfolio-container {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: scroll;
+            scroll-behavior: smooth;
+            padding: 1rem;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .portfolio-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .portfolio-item {
+            min-width: 18.75rem;
+            max-width: 18.75rem;
+            background: var(--background-dark);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            flex-shrink: 0;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #333;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-0.625rem);
+            box-shadow: 0 10px 20px rgba(255, 64, 129, 0.2);
+        }
+
+        .nav-btn {
+            display: none; /* Mobil için varsayılan olarak gizli */
+            background: var(--primary-color);
+            border: none;
+            color: var(--text-light);
+            font-size: 2rem;
+            width: 3rem;
+            height: 3rem;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.3s;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+        
+        @media (min-width: 769px) {
+            .nav-btn {
+                display: flex; /* Masaüstü için görünür */
+            }
+        }
+
+        .nav-btn:hover {
+            opacity: 0.8;
+        }
+
+        .left-btn {
+            left: -1rem;
+        }
+
+        .right-btn {
+            right: -1rem;
+        }
+
+        .read-more {
+            margin-top: 1rem;
+            background: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.625rem 0.9375rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .read-more:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+
+
+        /* ===================== Paket Karşılaştırma Tablosu ===================== */
+.pricing-section {
+    text-align: center;
+    padding: 5rem 1rem;
+}
+
+.pricing-section h2 {
+    font-size: clamp(2.5rem, 5vw, 3rem);
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.pricing-subtitle {
+    max-width: 600px;
+    margin: 0 auto 3rem auto;
+    color: var(--text-medium);
+    font-size: 1.1rem;
+}
+
+.pricing-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.pricing-card {
+    background-color: var(--background-medium);
+    border-radius: 1rem;
+    padding: 2.5rem 1.5rem;
+    max-width: 20rem;
+    width: 100%;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.package-header {
+    margin-bottom: 1.5rem;
+}
+
+.package-header h3 {
+    font-size: 2rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.package-header h4 {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.header-icon {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    background-color: #333;
+    display: inline-block;
+    padding: 0.2rem 0.8rem;
+    border-radius: 1rem;
+}
+
+.package-description {
+    color: var(--text-medium);
+    min-height: 5rem;
+}
+
+.features {
+    list-style: none;
+    text-align: left;
+    margin: 2rem 0;
+}
+
+.features li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.features li:last-child {
+    border-bottom: none;
+}
+
+.features li i {
+    color: #28a745; /* Yeşil check işareti */
+}
+
+.delivery-time {
+    margin: 2rem 0;
+    text-align: left;
+}
+
+.delivery-option {
+    margin-bottom: 0.5rem;
+}
+
+.select-btn {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.select-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+/* Responsive kurallar */
+@media (max-width: 768px) {
+    .pricing-card {
+        padding: 2rem 1rem;
+    }
+}
+
+        
+        /* ===================== İletişim Formu ===================== */
+        .contact-section {
+    text-align: center;
+    background: #111;
+    color: #fff;
+}
+
+.contact-section h2 {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    margin-bottom: 1.25rem;
+    color: var(--primary-color);
+    text-align: center; /* Başlığı ortalar */
+}
+
+.contact-section p {
+    color: var(--text-dark);
+    margin-bottom: 1.875rem;
+}
+
+.contact-icons {
+    display: flex;
+    justify-content: center; /* İkonları ortalar */
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2rem; /* İkonlar ile form arasına boşluk bırakır */
+}
+
+.icon {
+    background: #222;
+    padding: 1.125rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.icon i {
+    width: 1.5rem;
+    height: 1.5rem;
+    stroke: white;
+}
+
+.icon:hover {
+    background: var(--primary-color);
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(233, 30, 99, 0.6);
+}
+#contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 500px;
+    margin: 0 auto 2rem auto;
+    width: 100%;
+}
+.captcha-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.captcha-box {
+    width: 140px; /* Sabit bir genişlik ver */
+    height: 40px; /* Sabit bir yükseklik ver */
+    background-color: var(--background-medium);
+    border: 1px solid #333;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.25rem;
+    font-family: 'Roboto Mono', monospace; /* Kod fontu */
+    color: var(--text-light);
+    user-select: none; /* Metnin kopyalanmasını engeller */
+}
+
+#refreshBtn {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+#refreshBtn:hover {
+    background-color: #9e1b1b;
+    transform: scale(1.05);
+}
+
+#captchaInput {
+    width: 140px;
+    height: 40px;
+    background-color: var(--background-medium);
+    border: 1px solid #333;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    color: var(--text-light);
+    font-size: 1rem;
+    text-align: center;
+}
+
+#captchaInput:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+
+.form-group {
+    width: 100%;
+}
+
+#contact-form input,
+#contact-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #333;
+    background-color: #222;
+    color: var(--text-light);
+    font-size: 1rem;
+}
+
+#contact-form input:focus,
+#contact-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+#contact-form textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.send-btn {
+    background: var(--primary-color);
+    color: var(--text-light);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.send-btn:hover {
+    background: var(--primary-color);
+    transform: scale(1.02);
+}
+/* ===================== İletişim Formu Bildirim Mesajı ===================== */
+#form-status {
+    background-color: #28a745; /* Yeşil arka plan */
+    color: #fff;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto 1rem auto;
+    transition: opacity 0.5s ease-in-out;
+    opacity: 1;
+}
+
+#form-status.hidden {
+    opacity: 0;
+    pointer-events: none; /* Üzerine tıklanamaz yapar */
+}
+        /* ===================== Footer ===================== */
+        footer {
+            text-align: center;
+            padding: 1.875rem 1.25rem;
+            background: var(--background-medium);
+            color: var(--text-dark);
+            border-top: 1px solid #333;
+        }
+
+        /* ===================== Responsive Kurallar ===================== */
+        @media (max-width: 768px) {
+            section {
+                padding: 4rem 1rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 0.625rem;
+                padding: 0.625rem 0;
+            }
+
+            #hakkimda {
+                padding-top: 8rem;
+            }
+
+            .portfolio-item {
+                min-width: 90%;
+                max-width: 90%;
+            }
+
+            .portfolio-container {
+                justify-content: flex-start;
+            }
+
+            #three-container {
+                height: 20rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+    <div class="nav-links">
+        <a href="#hakkimda">Hakkımda</a>
+        <a href="#portfolyo">Portfolyo</a>
+        <a href="#hizmetler">Hizmetler</a>
+        <a href="#contact">İletişim</a>
+    </div>
+    <div class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+    </div>
+</nav>
+
+    <section id="hakkimda">
+    <div class="background-text"></div>
+    <div class="background-text"></div>
+    <div class="background-text"></div>
+    <div class="background-text"></div>
+    <div class="background-text"></div>
+    <img src="img/resim.jpeg" alt="Profil Fotoğrafı">
+    <h1>Çağlar Kurkman</h1>
+    <p>Yazılım dünyasına olan merakım ve çözüm odaklı yaklaşımım beni sürekli yeni teknolojiler keşfetmeye yöneltti. Full Stack Developer olma hedefiyle çıktığım bu yolda, hem ön yüzü (front-end) hem de arka yüzü (back-end) kapsayan projelerle kendimi geliştirdim.Node.js ve C# gibi güçlü dillerle web projeleri geliştirirken, Flutter ile mobil dünyaya adım attım. Aynı zamanda Unity ve Blender kullanarak hem oyun geliştirme hem de 3D tasarım alanlarında yaratıcılığımı besledim. Bu yolculukta edindiğim en önemli becerilerden biri de sadece kod yazmak değil, aynı zamanda farklı alanlar arasında köprü kurabilmek oldu.</p>
+</section>
+
+    <section id="model-viewer">
+    
+    <div class="three-background-text" style="top: 15%; left: 10%; transform: rotate(-15deg);">RENDER</div>
+    <div class="three-background-text" style="top: 70%; left: 5%; transform: rotate(10deg);">3D MODEL</div>
+    <div class="three-background-text" style="top: 45%; left: 2%; transform: rotate(5deg);">ANIMATION</div>
+
+    <div class="three-background-text" style="top: 15%; right: 5%; transform: rotate(10deg);">LIGHTING</div>
+    <div class="three-background-text" style="top: 70%; right: 10%; transform: rotate(-15deg);">VR AR</div>
+    <div class="three-background-text" style="top: 45%; right: 2%; transform: rotate(-5deg);">GPU</div>
+    <div class="three-background-text" style="top: 25%; right: 15%; transform: rotate(15deg);">CPU</div>
+    <div class="three-background-text" style="top: 25%; right: 25%; transform: rotate(20deg);">WEBGL</div> <div id="three-container">
+        </div>
+</section>
+
+    <section id="portfolyo">
+        <h2>Portfolyo</h2>
+        <div class="portfolio-wrapper">
+            <button class="nav-btn left-btn">&#10094;</button>
+            <div class="portfolio-container">
+                <div class="portfolio-item">
+                    <h3>Leaderboard System</h3>
+                    <p>
+                        Gerçek zamanlı oyun sıralamalarını takip etmek için geliştirdiğim modern bir Leaderboard sistemi. Node.js ve MongoDB ile güçlü bir backend, TailwindCSS ile de hızlı ve şık bir arayüz tasarladım. Oyuncuların skorlarını 
+                        <span class="more-text" style="display:none;">
+                            anlık olarak görüntüleyebilecekleri, dinamik ve ölçeklenebilir bir yapı sunuyor.
+                        </span>
+                    </p>
+                    <button class="read-more">Devamını Gör</button>
+                </div>
+
+                <div class="portfolio-item">
+                    <h3>Bilgisayar Donanımı ve Eğitim VR Projesi</h3>
+                    <p>
+                        Unity ve C# kullanarak geliştirdiğim VR tabanlı bilgisayar donanımı eğitim uygulaması. Kullanıcılar VR gözlükle anakart, RAM, ekran kartı gibi donanım parçalarının montajını interaktif
+                        <span class="more-text" style="display:none;">
+                            olarak deneyimleyerek öğrenebiliyor. Gerçekçi bir uygulama deneyimi sunarak öğrenme sürecini hem eğlenceli hem de kalıcı hale getiriyor.
+                        </span>
+                    </p>
+                    <button class="read-more">Devamını Gör</button>
+                </div>
+
+                <div class="portfolio-item">
+                    <h3>Gerçek Zamanlı Sohbet Uygulaması</h3>
+                    <p>
+                        Takım arkadaşlarımla birlikte geliştirdiğimiz gerçek zamanlı sohbet uygulaması. WhatsApp kadar büyük olmasa da kullanıcıların anlık olarak mesajlaşabildiği, modern
+                        <span class="more-text" style="display:none;">
+                            arayüzüyle öne çıkan bir proje oldu. MySQL, Node.js, React, Next.js ve TailwindCSS kullanılarak güçlü ve ölçeklenebilir bir yapı kurduk.
+                        </span>
+                    </p>
+                    <button class="read-more">Devamını Gör</button>
+                </div>
+
+                <div class="portfolio-item">
+                    <h3>Yeni Proje</h3>
+                    <p>
+                        Bu kısımda ekstra projelerini gösterebilirsin.
+                        <span class="more-text" style="display:none;">Detaylar burada olacak.</span>
+                    </p>
+                    <button class="read-more">Devamını Gör</button>
+                </div>
+            </div>
+            <button class="nav-btn right-btn">&#10095;</button>
+        </div>
+    </section>
+
+<section id="hizmetler" class="pricing-section">
+    <h2>Paketleri Karşılaştırın</h2>
+    <p class="pricing-subtitle">Hangi paketi seçeceğine karar veremiyorsan freelancer'a hemen danışabilirsin.</p>
+
+    <div class="pricing-container">
+        <div class="pricing-card">
+            <div class="package-header">
+                <h3>15.000 TL</h3>
+                <h4>Pro</h4>
+                <div class="header-icon">Elmas</div>
+            </div>
+            <p class="package-description">İhtiyaca özel tüm fonksiyonların dahil olduğu, e-ticaret özellikli paket</p>
+            <ul class="features">
+                <li>Sayfa Sayısı: <span>10</span></li>
+                <li>Tasarım Özelleştirme: <i class="fas fa-check-circle"></i></li>
+                <li>İçerik Girişi: <i class="fas fa-check-circle"></i></li>
+                <li>Responsive Tasarım: <i class="fas fa-check-circle"></i></li>
+                <li>Kaynak Kodları: <i class="fas fa-check-circle"></i></li>
+                <li>Revizyon: <span>10</span></li>
+            </ul>
+            <div class="delivery-time">
+                <div class="delivery-option">
+                    <input type="radio" id="pro-1" name="pro-delivery" value="15000" checked>
+                    <label for="pro-1">15 gün</label>
+                </div>
+                <div class="delivery-option">
+                    <input type="radio" id="pro-2" name="pro-delivery" value="21000">
+                    <label for="pro-2">10 gün (+6000 TL)</label>
+                </div>
+            </div>
+            <button class="select-btn">Seç 15.000 TL</button>
+        </div>
+
+        <div class="pricing-card">
+            <div class="package-header">
+                <h3>7.500 TL</h3>
+                <h4>Standart</h4>
+                <div class="header-icon">Altın</div>
+            </div>
+            <p class="package-description">Dinamik özelliklere sahip, responsive tasarımlı ve içerik yönetim panelli bir web sitesi.</p>
+            <ul class="features">
+                <li>Sayfa Sayısı: <span>5</span></li>
+                <li>Tasarım Özelleştirme: <i class="fas fa-check-circle"></i></li>
+                <li>İçerik Girişi: <i class="fas fa-check-circle"></i></li>
+                <li>Responsive Tasarım: <i class="fas fa-check-circle"></i></li>
+                <li>Kaynak Kodları: <i class="fas fa-check-circle"></i></li>
+                <li>Revizyon: <span>2</span></li>
+            </ul>
+            <div class="delivery-time">
+                <div class="delivery-option">
+                    <input type="radio" id="std-1" name="std-delivery" value="7500" checked>
+                    <label for="std-1">7 gün</label>
+                </div>
+                <div class="delivery-option">
+                    <input type="radio" id="std-2" name="std-delivery" value="11500">
+                    <label for="std-2">3 gün (+4000 TL)</label>
+                </div>
+            </div>
+            <button class="select-btn">Seç 7.500 TL</button>
+        </div>
+
+        <div class="pricing-card">
+            <div class="package-header">
+                <h3>3.000 TL</h3>
+                <h4>Temel</h4>
+                <div class="header-icon">Gümüş</div>
+            </div>
+            <p class="package-description">Sadece temel özelliklerin yer aldığı, ihtiyacını karşılayacak statik bir web sayfası.</p>
+            <ul class="features">
+                <li>Sayfa Sayısı: <span>1</span></li>
+                <li>Tasarım Özelleştirme: <i class="fas fa-check-circle"></i></li>
+                <li>İçerik Girişi: <i class="fas fa-check-circle"></i></li>
+                <li>Responsive Tasarım: <span>-</span></li>
+                <li>Kaynak Kodları: <i class="fas fa-check-circle"></i></li>
+                <li>Revizyon: <span>1</span></li>
+            </ul>
+            <div class="delivery-time">
+                <div class="delivery-option">
+                    <input type="radio" id="temel-1" name="temel-delivery" value="3000" checked>
+                    <label for="temel-1">3 gün</label>
+                </div>
+                <div class="delivery-option">
+                    <input type="radio" id="temel-2" name="temel-delivery" value="5000">
+                    <label for="temel-2">1 gün (+2000 TL)</label>
+                </div>
+            </div>
+            <button class="select-btn">Seç 3.000 TL</button>
+        </div>
+    </div>
+</section>
+
+
+    
+    <section id="contact" class="contact-section">
+    <h2>İletişim</h2>
+    <p>Projeler hakkında konuşmak veya sadece selamlaşmak istersen, aşağıdaki formu doldurabilir veya sosyal medya hesaplarımdan bana ulaşabilirsin.</p>
+
+    <div id="form-status" class="hidden">Mesajınız başarıyla gönderildi!</div>
+
+    <form id="contact-form" action="https://api.web3forms.com/submit" method="POST">
+    <input type="hidden" name="access_key" value="dc89b8b1-5bbe-4b62-9bc3-7285785c5135">
+
+    <div class="form-group">
+        <input type="text" name="name" id="name" placeholder="Adın Soyadın" required>
+    </div>
+    <div class="form-group">
+        <input type="email" name="email" id="email" placeholder="E-posta Adresin" required>
+    </div>
+    <div class="form-group">
+        <textarea name="message" id="message" placeholder="Mesajın" required></textarea>
+    </div>
+
+    <label>
+      Doğrulama kodunu girin
+      <div class="captcha-row">
+        <div id="captchaBox" class="captcha-box" aria-live="polite" aria-label="Doğrulama kodu">----</div>
+        <button type="button" id="refreshBtn" class="secondary">Yenile</button>
+        <input type="text" id="captchaInput" placeholder="Kod" style="width:140px" autocomplete="off" inputmode="latin" />
+      </div>
+    </label>
+
+    <button type="submit" class="send-btn">Gönder</button>
+    
+</form>
+
+    <div class="contact-icons">
+        <a href="https://github.com/caglarkurkman" target="_blank" class="icon">
+            <i data-lucide="github"></i>
+        </a>
+        <a href="https://linkedin.com/in//çağlar-kurkman-431810280" target="_blank" class="icon">
+            <i data-lucide="linkedin"></i>
+        </a>
+    </div>
+</section>
+
+    <footer>
+        &copy; 2025 Çağlar Kurkman. Tüm hakları saklıdır.
+    </footer>
+
+    <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    // Hamburger menü işlevselliği
+const hamburger = document.querySelector(".hamburger");
+const navLinks = document.querySelector(".nav-links");
+const links = document.querySelectorAll('.nav-links a');
+
+hamburger.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+    hamburger.classList.toggle("active");
+});
+
+links.forEach(link => {
+    link.addEventListener("click", () => {
+        navLinks.classList.remove("active");
+        hamburger.classList.remove("active");
+    });
+});
+
+    // Arka plan kelimeleri için JavaScript
+const techWords = ['Node.js', 'HTML', 'CSS', 'JavaScript', 'Unity', 'C#', 'Blender', 'Flutter'];
+const hakkimdaSection = document.getElementById('hakkimda');
+
+// Kelimelerin konumlarını rastgele değil, sabit bir şekilde belirle
+const wordPositions = [
+    { text: 'HTML', x: '10%', y: '15%', rotate: '-10deg' },
+    { text: 'CSS', x: '25%', y: '40%', rotate: '15deg' },
+    { text: 'JavaScript', x: '12%', y: '65%', rotate: '-5deg' },
+    { text: 'Node.js', x: '30%', y: '80%', rotate: '20deg' },
+    { text: 'Unity', x: '75%', y: '10%', rotate: '10deg' },
+    { text: 'Blender', x: '88%', y: '35%', rotate: '-15deg' },
+    { text: 'C#', x: '70%', y: '60%', rotate: '5deg' },
+    { text: 'Flutter', x: '82%', y: '85%', rotate: '-20deg' },
+    // Dilersen buraya daha fazla kelime ekleyebilirsin
+];
+
+function createBackgroundWords() {
+    if (!hakkimdaSection) return;
+    
+    // Önceki kelimeleri temizle
+    hakkimdaSection.querySelectorAll('.background-text').forEach(el => el.remove());
+
+    const fragment = document.createDocumentFragment();
+
+    wordPositions.forEach(pos => {
+        const div = document.createElement('div');
+        div.classList.add('background-text');
+        div.textContent = pos.text;
+
+        div.style.top = pos.y;
+        div.style.left = pos.x;
+        div.style.transform = `rotate(${pos.rotate})`;
+
+        fragment.appendChild(div);
+    });
+
+    hakkimdaSection.prepend(fragment);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    createBackgroundWords();
+    const backgroundTexts = document.querySelectorAll('.background-text');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            } else {
+                entry.target.classList.remove('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    backgroundTexts.forEach(text => {
+        observer.observe(text);
+    });
+});
+    // Tüm butonları seç
+    const buttons = document.querySelectorAll('.read-more');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            const moreText = button.previousElementSibling.querySelector('.more-text');
+            if (moreText.style.display === "none" || moreText.style.display === "") {
+                moreText.style.display = "inline";
+                button.textContent = "Daha Az Göster";
+            } else {
+                moreText.style.display = "none";
+                button.textContent = "Devamını Gör";
+            }
+        });
+    });
+
+    
+
+    lucide.createIcons();
+
+    const portfolioContainer = document.querySelector('.portfolio-container');
+    const leftBtn = document.querySelector('.left-btn');
+    const rightBtn = document.querySelector('.right-btn');
+
+    leftBtn.addEventListener('click', () => {
+        portfolioContainer.scrollBy({ left: -portfolioContainer.clientWidth, behavior: 'smooth' });
+    });
+
+    rightBtn.addEventListener('click', () => {
+        portfolioContainer.scrollBy({ left: portfolioContainer.clientWidth, behavior: 'smooth' });
+    });
+
+    // ===================== 3D Model Bölümü ===================== //
+    const threeContainer = document.getElementById("three-container");
+
+    if (threeContainer) {
+        // Sahne
+        const scene = new THREE.Scene();
+
+        // Kamera
+        const camera = new THREE.PerspectiveCamera(
+            75,
+            threeContainer.clientWidth / threeContainer.clientHeight,
+            0.1,
+            1000
+        );
+        camera.position.set(0, 1, 3);
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setClearColor(0x000000, 0);
+        renderer.setSize(threeContainer.clientWidth, threeContainer.clientHeight);
+        threeContainer.appendChild(renderer.domElement);
+
+        
+        const light = new THREE.DirectionalLight(0xffffff, 2);
+        light.position.set(5, 5, 5);
+        scene.add(light);
+
+        const ambient = new THREE.AmbientLight(0xffffff, 1);
+        scene.add(ambient);
+
+        
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.enablePan = false;
+        controls.minDistance = 2;
+        controls.maxDistance = 10;
+
+       
+        const loader = new GLTFLoader();
+        loader.load(
+            './models/scene.gltf',
+            function (gltf) {
+                const model = gltf.scene;
+                scene.add(model);
+                model.scale.set(0.3, 0.3, 0.3);
+                model.position.y = -0.5;
+                model.rotation.y = Math.PI * 1.35;
+                console.log('Gaming PC modeli başarıyla yüklendi.');
+            },
+            undefined,
+            function (error) {
+                console.error('Model yüklenemedi:', error);
+            }
+        );
+
+        // Animasyon Döngüsü
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Ekran boyutu değişince güncelle
+        window.addEventListener("resize", () => {
+            const newWidth = threeContainer.clientWidth;
+            const newHeight = threeContainer.clientHeight;
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(newWidth, newHeight);
+        });
+    }
+
+/ ===================== Fiyat Değiştirme İşlevselliği ===================== //
+document.addEventListener('DOMContentLoaded', () => {
+    // Tüm fiyat kartlarını seç
+    const pricingCards = document.querySelectorAll('.pricing-card');
+
+    pricingCards.forEach(card => {
+        const deliveryOptions = card.querySelectorAll('.delivery-option input[type="radio"]');
+        const selectBtn = card.querySelector('.select-btn');
+
+        // Radyo butonu değiştiğinde fiyatı güncelle
+        deliveryOptions.forEach(option => {
+            option.addEventListener('change', () => {
+                const newPrice = option.value;
+                selectBtn.textContent = `Seç ${newPrice} TL`;
+            });
+        });
+    });
+});
+
+// ===================== Satın Alma İşlemi ===================== //
+document.addEventListener('DOMContentLoaded', () => {
+    const selectButtons = document.querySelectorAll('.select-btn');
+
+    selectButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const pricingCard = button.closest('.pricing-card');
+            const packageName = pricingCard.querySelector('h4').textContent;
+            const price = button.textContent.split(' ')[1]; // Buton metninden fiyatı al
+
+            // Kullanıcıyı iletişim bölümüne kaydır
+            const contactSection = document.getElementById('contact');
+            contactSection.scrollIntoView({ behavior: 'smooth' });
+
+            // İletişim formundaki mesaj kutusunu önceden doldur
+            const messageTextarea = document.getElementById('message');
+            messageTextarea.value = `${packageName} paketini (${price}) satın almak istiyorum.`;
+        });
+    });
+});
+
+
+  const CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let currentCaptcha = '';
+
+  // Güvenli rastgele sayı üretimi (0..max-1)
+  function secureRandomInt(max) {
+    const array = new Uint32Array(1);
+    window.crypto.getRandomValues(array);
+    return array[0] % max;
+  }
+
+  // Uzunluk 4 veya 5 (rastgele)
+  function randomLength() {
+    return (secureRandomInt(2) === 0) ? 4 : 5;
+  }
+
+  // Captcha üret
+  function generateCaptcha() {
+    const len = randomLength();
+    let s = '';
+    for (let i = 0; i < len; i++) {
+      s += CHARSET.charAt(secureRandomInt(CHARSET.length));
+    }
+    currentCaptcha = s;
+    // Görsel gösterim: harfleri aralıklı göstermeyi tercih ettim
+    document.getElementById('captchaBox').textContent = s;
+    document.getElementById('captchaInput').value = '';
+  }
+
+  // İlk captcha üretimi
+  generateCaptcha();
+
+
+   // İletişim formu işlevselliği
+const contactForm = document.getElementById('contact-form');
+const formStatus = document.getElementById('form-status');
+  const captchaInput = document.getElementById('captchaInput');
+  const refreshBtn = document.getElementById('refreshBtn');
+
+    refreshBtn.addEventListener('click', generateCaptcha);
+
+contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Sayfanın yeniden yüklenmesini engelle
+
+    const formData = new FormData(e.target);
+
+    const entered = captchaInput.value.trim();
+    if (!entered) {
+            formStatus.textContent = 'Doğrulama kodunu girin.';
+            formStatus.style.backgroundColor = '#dc3545';
+            formStatus.classList.remove('hidden');
+    }
+
+    if (entered !== currentCaptcha) {
+        formStatus.textContent = 'Doğrulama kodu yanlış. Lütfen tekrar deneyin.';
+        formStatus.style.backgroundColor = '#dc3545'; // Kırmızı arka plan
+        formStatus.classList.remove('hidden');
+        generateCaptcha(); // Yeni captcha üret
+        setTimeout(() => {
+            formStatus.classList.add('hidden');
+        }, 5000); // 5 saniye sonra bildirimi gizle
+        return; // Doğrulama başarısızsa formu gönderme
+    }
+    
+// bak burada form doğrulamasını check etmelisin etmemişsin hm
+
+    const formUrl = e.target.action;
+    const formMethod = e.target.method;
+
+    try {
+        const response = await fetch(formUrl, {
+            method: formMethod,
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+            formStatus.textContent = 'Mesajınız başarıyla gönderildi!';
+            formStatus.style.backgroundColor = '#28a745'; // Yeşil arka plan
+            formStatus.classList.remove('hidden');
+            contactForm.reset(); // Formu temizle
+            setTimeout(() => {
+                formStatus.classList.add('hidden');
+            }, 5000); // 5 saniye sonra bildirimi gizle
+        } else {
+            formStatus.textContent = 'Bir hata oluştu, lütfen tekrar deneyin.';
+            formStatus.style.backgroundColor = '#dc3545';
+            formStatus.classList.remove('hidden');
+        }
+    } catch (error) {
+        formStatus.textContent = 'Bir hata oluştu, lütfen tekrar deneyin.';
+        formStatus.style.backgroundColor = '#dc3545';
+        formStatus.classList.remove('hidden');
+    }
+});
+
+</script>
+</body>
+</html>
